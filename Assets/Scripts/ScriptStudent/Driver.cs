@@ -16,12 +16,12 @@ public class Driver : MonoBehaviour
         //steering = 0.0f;
     }
 
-
     // Update is called once per frame
     void Update()
     {
         Steer();
     }
+
     public void Steer()
     {
         float steerAmount = Input.GetAxis("Horizontal") * steering * Time.deltaTime;
