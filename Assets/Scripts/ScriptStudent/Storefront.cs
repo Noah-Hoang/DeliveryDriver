@@ -1,8 +1,11 @@
 using OpenCover.Framework.Model;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 public class Storefront : MonoBehaviour
 {
@@ -19,14 +22,22 @@ public class Storefront : MonoBehaviour
 
     [Header("Important Locations")]
     public Transform pickupLocation;
-    public Transform[] dropoffLocationsArray;
-    public List<Transform> dropoffLocationsList;
+    public GameObject houseHolder;
+    public List<Transform> dropoffList;
     
     [Header("Time Stuff")]
     public Text timerText;
     private float remainingTime;
     public float totalTime = 10.0f;
     public bool deliveryOngoing;
+
+    //Event is like when something special happens
+    //The transform inside the <> is to tell everything that is listening to the event where the dropoff point is and that the package was also picked up
+    //The different events listed are to show when the pacakge is picked up and whether it was delivererd successfully or not
+    [Header("Events")]
+    public UnityEvent<Transform> onPackagePickedUp;
+    public UnityEvent onPackageDeliverySuccessful;
+    public UnityEvent onPackageDeliveryUnsuccessful;
 
     public void Awake()
     {  
@@ -42,6 +53,7 @@ public class Storefront : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        dropoffList = houseHolder.GetComponentsInChildren<Dropoff>(true).Select(dropOff => dropOff.transform).ToList();
         CreatePackage();
         //dropoffLocationsArray = new Transform[4];
         //dropoffLocationsList = new List<Transform>();
@@ -60,11 +72,13 @@ public class Storefront : MonoBehaviour
             money -= 5;
             CreatePackage();
             deliveryOngoing = false;
-            for (int i = 0; i < dropoffLocationsList.Count; i++)
+            for (int i = 0; i < dropoffList.Count; i++)
             {
-                dropoffLocationsList[i].gameObject.SetActive(false);
+                dropoffList[i].gameObject.SetActive(false);
             }
             timerText.text = "Package Delivery Failed";
+
+            onPackageDeliveryUnsuccessful.Invoke();
         }
     }
 
@@ -77,12 +91,14 @@ public class Storefront : MonoBehaviour
     public void StartDelivery()
     {
         Debug.Log("Delivering Package");            
-        int index = Random.Range(0, dropoffLocationsArray.Length);
+        int index = UnityEngine.Random.Range(0, dropoffList.Count);
         //gets the randomly selected dropoff location and turns it on so it can run the Dropoff script
-        dropoffLocationsList[index].gameObject.SetActive(true);
+        dropoffList[index].gameObject.SetActive(true);
         //TODO: start timer
         remainingTime = totalTime;
         deliveryOngoing = true;
+
+        onPackagePickedUp.Invoke(dropoffList[index].transform);
     }
 
     public void EndDelivery()
@@ -94,6 +110,8 @@ public class Storefront : MonoBehaviour
         timerText.text = "Package Delivery Successful";
         //Gives money
         money = money + 10;
+
+        onPackageDeliverySuccessful.Invoke();        
     }
 
     void UpdateTimerUI()
