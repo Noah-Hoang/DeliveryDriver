@@ -7,6 +7,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
+//Class types in variables are set to null by default
+//Bool is set to false, int is set  to 0 and float is set to 0.0 by default
+
 public class Storefront : MonoBehaviour
 {
     // Singleton: A singleton is a design pattern that ensures a class only has one instance and provides a global point of access to it.
@@ -53,6 +56,13 @@ public class Storefront : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // houseHolder is referring to the houseHolder variable that was set at the top of the script.
+        // GetComponentsInChildren gets the Dropoff component attached to the children of the GameObject that houseHolder refers to.
+        // The <Dropoff> means that the script is specifically looking for the Dropoff class attached to the children of houseHolder.
+        // The parameter 'true' indicates that the method should include inactive children in the search.
+        // The method returns an array of Dropoff components.
+        // The Select method is then used to change the return type from a list of Dropoff classes to a list of transforms of the Dropoff classes
+        // Finally, the ToList() method converts the IEnumerable<Transform> into a List<Transform>, which is assigned to the dropoffList variable
         dropoffList = houseHolder.GetComponentsInChildren<Dropoff>(true).Select(dropOff => dropOff.transform).ToList();
         CreatePackage();
         //dropoffLocationsArray = new Transform[4];
@@ -93,12 +103,13 @@ public class Storefront : MonoBehaviour
         Debug.Log("Delivering Package");            
         int index = UnityEngine.Random.Range(0, dropoffList.Count);
         //gets the randomly selected dropoff location and turns it on so it can run the Dropoff script
-        dropoffList[index].gameObject.SetActive(true);
+        Transform dropoffLocation = dropoffList[index];
+        dropoffLocation.gameObject.SetActive(true);
         //TODO: start timer
         remainingTime = totalTime;
         deliveryOngoing = true;
 
-        onPackagePickedUp.Invoke(dropoffList[index].transform);
+        onPackagePickedUp.Invoke(dropoffLocation);
     }
 
     public void EndDelivery()

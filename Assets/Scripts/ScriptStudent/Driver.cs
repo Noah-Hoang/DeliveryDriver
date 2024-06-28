@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class Driver : MonoBehaviour
 {
+    public bool boostActivated;
+    public float remainingTime = 5.0f;    
     [SerializeField]
     private float moveSpeed = 0.0f;
     [SerializeField]
@@ -19,6 +21,7 @@ public class Driver : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Countdown();   
         Steer();
     }
 
@@ -68,4 +71,21 @@ public class Driver : MonoBehaviour
         //transform.Rotate(0, 0, steerAmount);
         //transform.Translate(0, moveAmount, 0);
     }
+    public void Countdown()
+    {
+        if (boostActivated && remainingTime > 0)
+        {
+            remainingTime -= Time.deltaTime;
+        }
+    }
+
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag.Equals("Boost"))
+        {
+            boostActivated = true;
+            remainingTime = 5.0f;
+        }
+    }
+
 }
