@@ -5,12 +5,13 @@ using UnityEngine;
 
 public class Driver : MonoBehaviour
 {
-    public bool boostActivated;
+    private bool boostActivated;
     public float remainingTime = 5.0f;    
     [SerializeField]
     private float moveSpeed = 0.0f;
     [SerializeField]
-    private float steering = 0.0f;
+    private float rotateSpeed = 0.0f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -27,7 +28,7 @@ public class Driver : MonoBehaviour
 
     public void Steer()
     {
-        float steerAmount = Input.GetAxis("Horizontal") * steering * Time.deltaTime;
+        float steerAmount = Input.GetAxis("Horizontal") * rotateSpeed * Time.deltaTime;
         float moveAmount = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
         transform.Rotate(0, 0, -steerAmount);
         transform.Translate(0, moveAmount, 0);
@@ -76,15 +77,28 @@ public class Driver : MonoBehaviour
         if (boostActivated && remainingTime > 0)
         {
             remainingTime -= Time.deltaTime;
+
+        }
+        else 
+        {
+            boostActivated = false;
+            moveSpeed = 10.0f;
         }
     }
 
     public void OnTriggerEnter2D(Collider2D collision)
     {
+        Debug.Log("Entered Trigger");
         if (collision.gameObject.tag.Equals("Boost"))
         {
+            if (!boostActivated)
+            {
+                moveSpeed = moveSpeed * 2;
+            }
             boostActivated = true;
-            remainingTime = 5.0f;
+            remainingTime = 5.0f;       
+            Debug.Log("Boost Activated");
+            Destroy(collision.gameObject);
         }
     }
 
