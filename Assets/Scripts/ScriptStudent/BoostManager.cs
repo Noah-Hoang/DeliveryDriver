@@ -25,7 +25,9 @@ public class BoostManager : MonoBehaviour
 
     public void ActivateRandomBoost()
     {
+        // the number that is the index (in this case the randomly chosen one) corresponds to the point in the list
         int index = UnityEngine.Random.Range(0, boostList.Count);
+        // boostList[index] is basically the game object associated with the randomly chosen index from the line above
         GameObject boostLocation = boostList[index];
         boostLocation.SetActive(true);
         remainingTime = 10.0f;

@@ -100,9 +100,10 @@ public class Storefront : MonoBehaviour
 
     public void StartDelivery()
     {
-        Debug.Log("Delivering Package");            
+        Debug.Log("Delivering Package");
+        // the number that is the index (in this case the randomly chosen one) corresponds to the point in the list
         int index = UnityEngine.Random.Range(0, dropoffList.Count);
-        //gets the randomly selected dropoff location and turns it on so it can run the Dropoff script
+        // dropoffList[index] is basically the game object associated with the randomly chosen index from the line above
         Transform dropoffLocation = dropoffList[index];
         dropoffLocation.gameObject.SetActive(true);
         //TODO: start timer

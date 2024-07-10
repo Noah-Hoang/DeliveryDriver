@@ -5,12 +5,10 @@ using UnityEngine;
 
 public class Driver : MonoBehaviour
 {
-    private bool boostActivated;
+    public bool boostActivated;
     public float remainingTime = 5.0f;    
-    [SerializeField]
-    private float moveSpeed = 0.0f;
-    [SerializeField]
-    private float rotateSpeed = 0.0f;
+    public float moveSpeed = 0.0f;
+    public float rotateSpeed = 0.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -79,7 +77,7 @@ public class Driver : MonoBehaviour
             remainingTime -= Time.deltaTime;
 
         }
-        else 
+        else if (boostActivated)
         {
             boostActivated = false;
             moveSpeed = 10.0f;
@@ -98,7 +96,7 @@ public class Driver : MonoBehaviour
             boostActivated = true;
             remainingTime = 5.0f;       
             Debug.Log("Boost Activated");
-            Destroy(collision.gameObject);
+            collision.gameObject.SetActive(false);
         }
     }
 
