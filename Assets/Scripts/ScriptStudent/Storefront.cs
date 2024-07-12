@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 //Class types in variables are set to null by default
 //Bool is set to false, int is set  to 0 and float is set to 0.0 by default
@@ -18,21 +19,26 @@ public class Storefront : MonoBehaviour
     //Static makes a variable or method shared between all instances of the class
     //Instance example: Storefront class on multiple game objects. Each game object has its own instance(not the variable in this code) of the class
     public static Storefront Instance { get; private set; }
-
+   
     [Header("General")]
     public GameObject packagePrefab;
-    public int money;
+    public int money = 11;
+    public bool lose;
+    public Driver driver;
 
     [Header("Important Locations")]
     public Transform pickupLocation;
     public GameObject houseHolder;
     public List<Transform> dropoffList;
-    
+
     [Header("Time Stuff")]
+    public Text moneyText;
     public Text timerText;
-    private float remainingTime;
-    public float totalTime = 10.0f;
-    public bool deliveryOngoing;
+    public float moneyTime;
+    private float remainingDeliveryTime;
+    public float totalMoneyTime = 2.59f;
+    public float totalDeliveryTime = 10.0f;
+    public bool deliveryOngoing;  
 
     //Event is like when something special happens
     //The transform inside the <> is to tell everything that is listening to the event where the dropoff point is and that the package was also picked up
@@ -72,9 +78,17 @@ public class Storefront : MonoBehaviour
 
     void Update()
     {
-        if (deliveryOngoing && (remainingTime > 0))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            remainingTime -= Time.deltaTime;
+            money -= 5;
+            driver.boostActivated = true;
+        }
+
+        ChangeMoney();
+       
+        if (deliveryOngoing && (remainingDeliveryTime > 0))
+        {
+            remainingDeliveryTime -= Time.deltaTime;
             UpdateTimerUI();
         }
         else if (deliveryOngoing)
@@ -107,7 +121,7 @@ public class Storefront : MonoBehaviour
         Transform dropoffLocation = dropoffList[index];
         dropoffLocation.gameObject.SetActive(true);
         //TODO: start timer
-        remainingTime = totalTime;
+        remainingDeliveryTime = totalDeliveryTime;
         deliveryOngoing = true;
 
         onPackagePickedUp.Invoke(dropoffLocation);
@@ -128,9 +142,27 @@ public class Storefront : MonoBehaviour
 
     void UpdateTimerUI()
     {
-        int minutes = Mathf.FloorToInt(remainingTime / 60);
-        int seconds = Mathf.FloorToInt(remainingTime % 60);
+        int minutes = Mathf.FloorToInt(remainingDeliveryTime / 60);
+        int seconds = Mathf.FloorToInt(remainingDeliveryTime % 60);
         timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
+    public void ChangeMoney()
+    {
+        if (moneyTime > 0)
+        {
+            moneyTime -= Time.deltaTime;
+        }
+        else
+        {
+            moneyTime = totalMoneyTime;
+            money -= 1;
+        }
+        moneyText.text = "Current Money: $" + money.ToString();
+        if (money <= 0)
+        {
+            SceneManager.LoadScene(1);
+        }
     }
 }
 

@@ -18,26 +18,11 @@ public class RoadDetector : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-       
+        HandleSpeed();
     }
-
-    // if on road, 
-    public void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.tag.Equals("Road") && !driver.boostActivated)
-        {
-            driver.moveSpeed = maxMoveSpeed;           
-        }       
-    }
-
-    // if off road,
+    
     public void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.gameObject.tag.Equals("Road") && !driver.boostActivated)
-        {
-            driver.moveSpeed *= 0.75f;
-        }
-
+    {       
         if (collision.gameObject.tag.Equals("Road"))
         {
             onRoad = false;
@@ -49,6 +34,22 @@ public class RoadDetector : MonoBehaviour
         if (collision.gameObject.tag.Equals("Road"))
         {
             onRoad = true;
+        }
+    }
+
+    public void HandleSpeed()
+    {
+        if (onRoad && !driver.boostActivated)
+        {
+            driver.moveSpeed = maxMoveSpeed;
+        }
+        else if (onRoad && driver.boostActivated)
+        {
+            driver.moveSpeed = maxMoveSpeed * 2;
+        }
+        else if (!onRoad && !driver.boostActivated)
+        {
+            driver.moveSpeed = maxMoveSpeed * 0.75f;
         }
     }
 }
